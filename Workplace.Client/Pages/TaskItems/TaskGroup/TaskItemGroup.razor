@@ -1,0 +1,48 @@
+<div>
+    <h3 type="button" class="card-header border-3" @onclick="ToggleVisibility">@Header</h3>
+    @if (ShowTasks)
+    {
+        @if (!Tasks.Any())
+        {
+            <p>Похоже на этот день нет задач. Хотите добавить?</p>
+        }
+        else
+        {
+            <div class="vertical-card-group">
+                @foreach (var taskItem in Tasks)
+                {
+                    <div class="card">
+                        <TaskCard TaskItem="taskItem"
+                                  OnFavorite="async () => await OnFavorite!(taskItem)"
+                                  OnUpdate="async () => await OnUpdate!(taskItem)"
+                                  OnDelete="async () => await OnDelete!(taskItem.Id)"
+                                  OnInfo="async () => await OnInfo!(taskItem)"/>
+                    </div>
+                }
+            </div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter] public string Header { get; set; } = default!;
+
+    [Parameter] public IEnumerable<TaskItemDTO> Tasks { get; set; } = default!;
+
+    [Parameter] public Func<TaskItemDTO, Task>? OnFavorite { get; set; }
+
+    [Parameter] public Func<TaskItemDTO, Task>? OnUpdate { get; set; }
+    
+    [Parameter] public Func<TaskItemDTO, Task>? OnInfo { get; set; }
+
+    [Parameter] public Func<int, Task>? OnDelete { get; set; }
+    
+    [Parameter]
+    public bool ShowTasks { get; set; }
+
+    private void ToggleVisibility()
+    {
+        ShowTasks = !ShowTasks;
+    }
+
+}

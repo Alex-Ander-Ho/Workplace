@@ -1,0 +1,26 @@
+<div>
+    <TaskItemGroup Header="Сегодня" Tasks="TodayTasks" OnFavorite="OnFavorite!" OnUpdate="OnUpdate!" OnDelete="OnDelete!" OnInfo="OnInfo!" ShowTasks="true"/>
+    <TaskItemGroup Header="Завтра" Tasks="TomorrowTasks" OnFavorite="OnFavorite" OnUpdate="OnUpdate" OnDelete="OnDelete" OnInfo="OnInfo" ShowTasks="false"/>
+    <TaskItemGroup Header="Послезавтра" Tasks="DayAfterTomorrowTasks" OnFavorite="OnFavorite" OnUpdate="OnUpdate" OnDelete="OnDelete" OnInfo="OnInfo" ShowTasks="false"/>
+</div>
+
+@code {
+    [Parameter]
+    public IEnumerable<TaskItemDTO>? Tasks { get; set; }
+
+    [Parameter]
+    public Func<TaskItemDTO, Task>? OnFavorite { get; set; }
+
+    [Parameter]
+    public Func<TaskItemDTO, Task>? OnUpdate { get; set; }
+
+    [Parameter]
+    public Func<TaskItemDTO, Task>? OnInfo { get; set; }
+
+    [Parameter]
+    public Func<int, Task>? OnDelete { get; set; }
+
+    private IEnumerable<TaskItemDTO> TodayTasks => Tasks!.Where(t => t.StartTime!.Value.Date == DateTime.Today);
+    private IEnumerable<TaskItemDTO> TomorrowTasks => Tasks!.Where(t => t.StartTime!.Value.Date == DateTime.Today.AddDays(1));
+    private IEnumerable<TaskItemDTO> DayAfterTomorrowTasks => Tasks!.Where(t => t.StartTime!.Value.Date == DateTime.Today.AddDays(2));
+}

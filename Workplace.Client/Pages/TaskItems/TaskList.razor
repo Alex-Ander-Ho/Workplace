@@ -1,0 +1,72 @@
+﻿@page "/"
+@using Workplace.Client.Pages.TaskItems.TaskGroup
+@using Workplace.Shared
+@inject IDataService data
+
+<PageTitle>Список задач</PageTitle>
+
+<h3>Список задач</h3>
+
+@if (_tasks == null)
+{
+    <p>Loading ...</p>
+}
+else
+{
+    <TaskModal @ref="TaskModal" OnSubmit="OnSubmitHandler" />
+    <TaskModalInfo @ref="TaskModalInfo"/>
+
+    <div class="mb-3">
+        <button type="button" class="btn btn-success" @onclick="OnAddHandler">
+            Новая задача
+        </button>
+    </div>
+    
+    <TaskListGroups Tasks="_tasks" OnFavorite="OnFavoriteHandler" OnUpdate="OnUpdateHandler" OnDelete="OnDeleteHandler" OnInfo="OnInfoHandler"/>
+}
+
+@code {
+    TaskModal? TaskModal { get; set; }
+    TaskModalInfo? TaskModalInfo { get; set; }
+
+    private readonly List<TaskItemDTO> tasks = [];
+    IEnumerable<TaskItemDTO>? _tasks;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _tasks = await data.GetAllAsync();
+    }
+
+    async Task OnAddHandler()
+    {
+        await Task.Run(() => TaskModal!.Open(new TaskItemDTO()));
+    }
+
+    async Task OnFavoriteHandler(TaskItemDTO taskItem)
+    {
+        taskItem.IsFavorite = !taskItem.IsFavorite;
+        _tasks = await data.GetAllAsync(); // Обновить список задач после обновления
+    }
+
+    async Task OnUpdateHandler(TaskItemDTO taskItem)
+    {
+        await Task.Run(() => TaskModal!.Open(taskItem));
+    }
+
+    async Task OnSubmitHandler(TaskItemDTO taskItem)
+    {
+        await data.UpdateAsync(taskItem);
+        _tasks = await data.GetAllAsync(); // Обновить список задач после обновления
+    }
+    
+    async Task OnDeleteHandler(int taskItemId)
+    {
+        await data.DeleteAsync(taskItemId);
+        _tasks = await data.GetAllAsync(); // Обновить список задач после удаления
+    }
+    
+    async Task OnInfoHandler(TaskItemDTO taskItem)
+    {
+        await Task.Run(() => TaskModalInfo!.Open(taskItem));
+    }
+}

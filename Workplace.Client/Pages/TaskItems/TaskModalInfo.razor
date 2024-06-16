@@ -1,0 +1,58 @@
+<Modal @ref="Modal">
+    <Title>@TaskItem!.Name</Title>
+    <Body>
+        <ul class="list-group">
+            <li class="list-group-item" aria-disabled="true">
+                <label class="fw-bold" for="desc">@DisplayName(() => TaskItem!.Description)</label>
+                <div id="desc">@TaskItem!.Description</div>
+            </li>
+            <li class="list-group-item" aria-disabled="true">
+                <label class="fw-bold" for="teacher">@DisplayName(() => TaskItem!.Teacher)</label>
+                <div id="teacher">@TaskItem!.Teacher</div>
+            </li>
+            @if (TaskItem.StartTime.HasValue && TaskItem.EndTime.HasValue)
+            {
+                <li class="list-group-item" aria-disabled="true">
+                    <label class="fw-bold" for="time">Время проведения</label>
+                    <div id="time"> @TaskItem.StartTime.Value.ToString("t") - @TaskItem.EndTime.Value.ToString("t")</div>
+                </li>
+            }
+            <li class="list-group-item" aria-disabled="true">
+                <label class="fw-bold" for="loc">@DisplayName(() => TaskItem!.Location)</label>
+                <div id="loc">@TaskItem!.Location</div>
+            </li>
+        </ul>
+    </Body>
+    <Footer>
+        <button type="button" class="btn btn-danger" @onclick="Cancel">Закрыть</button>
+    </Footer>
+</Modal>
+
+@code {
+    Modal? Modal { get; set; }
+    TaskItemDTO? TaskItem { get; set; } = new();
+
+    public void Open(TaskItemDTO taskItem)
+    {
+        TaskItem = Clone(taskItem);
+        Modal!.Open();
+    }
+
+    async Task Cancel()
+    {
+        await Task.Run(() => Modal!.Close());
+    }
+
+    TaskItemDTO Clone(TaskItemDTO taskItem)
+    {
+        TaskItemDTO taskCopy = new();
+        taskCopy!.Id = taskItem.Id;
+        taskCopy!.Name = taskItem.Name;
+        taskCopy!.Description = taskItem.Description;
+        taskCopy!.StartTime = taskItem.StartTime;
+        taskCopy!.EndTime = taskItem.EndTime;
+        taskCopy!.Location = taskItem.Location;
+        taskCopy!.Teacher = taskItem.Teacher;
+        return taskCopy;
+    }
+}

@@ -1,0 +1,85 @@
+﻿<Modal @ref="Modal">
+    <Title>Форма редактирования задачи</Title>
+    <Body>
+        <EditForm Model="TaskItem" OnValidSubmit="Submit"> 
+            <DataAnnotationsValidator />
+
+            <div class="form-group">
+                <label for="name">@DisplayName(() => TaskItem!.Name)</label>
+                <InputText @bind-Value="TaskItem!.Name" class="form-control" id="name" />
+                <ValidationMessage For="@(() => TaskItem!.Name)" />
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="desc">@DisplayName(() => TaskItem.Description)</label>
+                <InputTextArea @bind-Value="TaskItem.Description" class="form-control" id="desc" />
+                <ValidationMessage For="@(() => TaskItem.Description)" />
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="teacher">@DisplayName(() => TaskItem.Teacher)</label>
+                <InputText @bind-Value="TaskItem.Teacher" class="form-control" id="teacher" />
+                <ValidationMessage For="@(() => TaskItem!.Teacher)" />
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="start">@DisplayName(() => TaskItem.StartTime)</label>
+                <InputDate Type="InputDateType.DateTimeLocal" @bind-Value="TaskItem.StartTime" class="form-control" id="start" />
+                <ValidationMessage For="@(() => TaskItem.StartTime)" />
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="end">@DisplayName(() => TaskItem.EndTime)</label>
+                <InputDate Type="InputDateType.DateTimeLocal" @bind-Value="TaskItem.EndTime" class="form-control" id="end" />
+                <ValidationMessage For="@(() => TaskItem.EndTime)" />
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="loc">@DisplayName(() => TaskItem.Location)</label>
+                <InputText @bind-Value="TaskItem.Location" class="form-control" id="loc" />
+                <ValidationMessage For="@(() => TaskItem!.Location)" />
+            </div>
+            <br />
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <button type="button" class="btn btn-secondary" @onclick="async () => await Cancel()">Отменить</button>
+        </EditForm>
+    </Body>
+</Modal>
+
+@code {
+    Modal? Modal { get; set; }
+    TaskItemDTO? TaskItem { get; set; } = new();
+
+    [Parameter, EditorRequired]
+    public EventCallback<TaskItemDTO> OnSubmit { get; set; }
+
+    public void Open(TaskItemDTO taskItem)
+    {
+        TaskItem = Clone(taskItem);
+        Modal!.Open();
+    }
+
+    async Task Submit()
+    {
+        await OnSubmit.InvokeAsync(TaskItem!);
+        await Task.Run(() => Modal!.Close());
+    }
+
+    async Task Cancel()
+    {
+        await Task.Run(() => Modal!.Close());
+    }
+
+    TaskItemDTO Clone(TaskItemDTO taskItem)
+    {
+        TaskItemDTO taskCopy = new();
+        taskCopy!.Id = taskItem.Id;
+        taskCopy!.Name = taskItem.Name;
+        taskCopy!.Description = taskItem.Description;
+        taskCopy!.StartTime = taskItem.StartTime;
+        taskCopy!.EndTime = taskItem.EndTime;
+        taskCopy!.Location = taskItem.Location;
+        taskCopy!.Teacher = taskItem.Teacher;
+        return taskCopy;
+    }
+}
